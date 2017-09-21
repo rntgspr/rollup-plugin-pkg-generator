@@ -1,0 +1,20 @@
+{
+  "name": "rollup-plugin-pkg-generator",
+  "version": "1.0.0",
+  "description": "Simple rollup plugin generate a package.json",
+  "main": "index.js",
+  "repository": "https://github.com/savantly-net/rollup-plugin-pkg-generator.git",
+  "scripts": {},
+  "keywords": [
+    "rollup",
+    "package.json",
+    "plugin",
+    "rollup-plugin"
+  ],
+  "author": "Jeremy Branham <Jeremy@Savantly.net>",
+  "license": "MIT",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "fs-extra": "^3.0.0"
+  }
+}
