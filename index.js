@@ -4,6 +4,10 @@ var _ = require('lodash');
 var cwd = process.cwd();
 const name = "rollup-plugin-pkg-generator";
 
+function info(msg) {
+	console.info('[' + name + '] ' +msg);
+}
+
 function success(msg) {
 	console.info('[' + name + '] ' +msg.green + "' (" + "\u2714".green + ")");
 }
@@ -28,45 +32,39 @@ function hasKeys(object) {
 module.exports = function(options = {}) {
 	const defaultOptions = {output: cwd+'/dist/', pkg:{}, useMainPackage: true};
 	options = _.assign(defaultOptions, options);
+	let pkg = {};
 
 	return {
 		name : name,
 		ongenerate : function(object) {
 
-			if (!options.useMainPackage) {
-				success('using provided pkg definition: ');
-				success(options.pkg);
-			} else {
+			if (options.useMainPackage) {
 				success('using main pkg definition for values.');
-				
-				var mainPkg = require(cwd + '/package.json');
+				var mainPkgFile = cwd + '/package.json';
+				var mainPkg = require(mainPkgFile);
 				if (!mainPkg) {
 					fatal('could not find main package.json to populate template', {errno:1});
 				} else {
-					options.pkg.name = options.pkg.name || mainPkg.name;
-					options.pkg.version = options.pkg.version || mainPkg.version;
-					options.pkg.description = options.pkg.description || mainPkg.description;
-					options.pkg.main = options.pkg.main || mainPkg.main;
-					options.pkg.module = options.pkg.module || mainPkg.module;
-					options.pkg.homepage = options.pkg.homepage || mainPkg.homepage;
-					options.pkg.repository = options.pkg.repository || mainPkg.repository;
-					options.pkg.typings = options.pkg.typings || mainPkg.typings;
-					options.pkg.keywords = options.pkg.keywords || mainPkg.keywords;
-					options.pkg.author = options.pkg.author || mainPkg.author;
-					options.pkg.license = options.pkg.license || mainPkg.license;
-					options.pkg.peerDependencies = options.pkg.peerDependencies || mainPkg.dependencies;
+					info('using values from ' + mainPkgFile);
+					pkg = _.assign(pkg, mainPkg);
 				}
 			}
 			
+			pkg = _.assign(pkg, options.pkg);
 			
-			var json = JSON.stringify(options.pkg, null, 4);
-			fs.writeFile(options.output + 'package.json', json, 'utf8', function(err){
-				if (err) {
-					fatal('failed to generate package.json', err);
-				} else {
-					success('generated package.json');
-				}
+			var file = options.output + 'package.json';
+			fs.ensureFile(file).then(function(){
+				fs.writeJson(file, pkg, {EOL: '\r\n', spaces: 2}, function(err){
+					if (err) {
+						fatal('failed to generate package.json', err);
+					} else {
+						success('generated package.json');
+					}
+				});
+			}).catch(function(err){
+				fatal('failed to create package.json', err);
 			});
+			
 
 		}
 	}
