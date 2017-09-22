@@ -1,6 +1,6 @@
 {
   "name": "rollup-plugin-pkg-generator",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Simple rollup plugin generate a package.json",
   "main": "index.js",
   "repository": "https://github.com/savantly-net/rollup-plugin-pkg-generator.git",
